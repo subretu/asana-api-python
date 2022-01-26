@@ -19,7 +19,7 @@ class Asana:
         data = req.json()
         return data
 
-    def get_tasks_from_a_section(self, project_id, api_target):
+    def get_sections_for_project(self, project_id, api_target):
         """
         project_id : プロジェクトID
         api_target : パラメータを含んだパス（詳細はhttps://developers.asana.com/docs/get-tasks-from-a-project参照）

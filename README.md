@@ -21,6 +21,6 @@ from asana import asana
 
 asana_api = asana.Asana("AsanaAPIKey")
 # 引数：プロジェクトID、パラメータを含んだパス
-task_data = asana_api.get_tasks_from_a_section(1234567890123456, "opt_fields=name,gid")
+task_data = asana_api.get_sections_for_project(1234567890123456, "opt_fields=name,gid")
 ```
   
