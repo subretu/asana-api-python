@@ -1,53 +1,35 @@
-import requests
-import json
+# asana-api-python
 
+## 概要
+- AsanaAPIのPythonラッパー。
+- 公式のAPIリファレンスは下記を参照。
+  - https://developers.asana.com/docs/asana
+## サンプル
+- プロジェクトからタスク一覧を抽出
 
-class Asana:
-    def __init__(self, apikey):
-        self.asana_url = "https://app.asana.com/api"
-        self.api_version = "1.0"
-        self.aurl = "/".join([self.asana_url, self.api_version])
-        self.apikey = apikey
+```python
+from asana import asana
 
-    def get_tasks_for_project(self, project_id, api_target):
-        """
-        project_id : プロジェクトID
-        api_target : パラメータを含んだパス（詳細はhttps://developers.asana.com/docs/get-tasks-from-a-project参照）
-        """
-        url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}"
-        req = requests.get(url, auth=(self.apikey, ""))
-        data = req.json()
-        self.all_tasks_count = len(data["data"])
+asana_api = asana.Asana("AsanaAPIKey")
+# 引数：プロジェクトID、パラメータを含んだパス
+task_data = asana_api.get_tasks_for_project(1234567890123456, "opt_fields=completed,name")
+```
+- プロジェクトからセクション一覧を抽出
 
-        return data
+```python
+from asana import asana
 
-    def get_sections_for_project(self, project_id, api_target):
-        """
-        project_id : プロジェクトID
-        api_target : パラメータを含んだパス（詳細はhttps://developers.asana.com/docs/get-tasks-from-a-project参照）
-        """
-        url = self.aurl + f"/projects/{project_id}/sections/?{api_target}"
-        req = requests.get(url, auth=(self.apikey, ""))
-        data = req.json()
+asana_api = asana.Asana("AsanaAPIKey")
+# 引数：プロジェクトID、パラメータを含んだパス
+task_data = asana_api.get_sections_for_project(1234567890123456, "opt_fields=name,gid")
+```
 
-        return data
+- プロジェクトから完了タスク数（全タスク数も）を抽出
 
-    def get_completed_tasks_for_project_count(self, project_id):
-        """
-        project_id : プロジェクトID
-        ※ 全タスク数とそのうちの完了タスク数を返す。
-        """
-        all_task = self.get_tasks_for_project(project_id, "opt_fields=completed")
-        completed_tasks = 0
-        for i in range(len(all_task["data"])):
-            completed = all_task["data"][i]["completed"]
-            if completed:
-                completed_tasks += 1
+```python
+from asana import asana
 
-        data = {
-            "total": self.all_tasks_count,
-            "completed": completed_tasks,
-        }
-        json_data = json.dumps(data)
-
-        return json_data
+asana_api = asana.Asana("AsanaAPIKey")
+# 引数：プロジェクトID
+task_data = asana_api.get_completed_tasks_for_project_count(1234567890123456)
+```
