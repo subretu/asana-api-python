@@ -20,16 +20,26 @@ task_data = asana_api.get_tasks_for_project(1234567890123456, "opt_fields=comple
 from asana import asana
 
 asana_api = asana.Asana("AsanaAPIKey")
-# 引数：プロジェクトID、パラメータを含んだパス
-task_data = asana_api.get_sections_for_project(1234567890123456, "opt_fields=name,gid")
+# 引数：プロジェクトID
+task_data = asana_api.get_sections_for_project(1234567890123456)
 ```
 
-- プロジェクトから完了タスク数（全タスク数も）を抽出
+- プロジェクトから完了タスク数を抽出
 
 ```python
 from asana import asana
 
 asana_api = asana.Asana("AsanaAPIKey")
 # 引数：プロジェクトID
-task_data = asana_api.get_completed_tasks_for_project_count(1234567890123456)
+task_data = asana_api.get_count_completed_tasks_for_project(1234567890123456)
+```
+
+- プロジェクトから期限超過タスクを抽出
+
+```python
+from asana import asana
+
+asana_api = asana.Asana("AsanaAPIKey")
+# 引数：プロジェクトID
+task_data = asana_api.get_overdue_tasks_for_project(1234567890123456)
 ```
