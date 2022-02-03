@@ -5,6 +5,12 @@ import json
 
 class AsanaBase:
     def __init__(self, apikey):
+        """API実行の準備を行う。
+
+        URL構築、APIキーの設定を行っている。
+
+        apikey : AsanaAPIのトークン
+        """
         self.asana_url = "https://app.asana.com/api"
         self.api_version = "1.0"
         self.aurl = "/".join([self.asana_url, self.api_version])
@@ -13,10 +19,15 @@ class AsanaBase:
 
 class GetTasks(AsanaBase):
     def __init__(self, apikey):
+        """親クラスの__init__を呼び出しを行う。
+
+        apikey : AsanaAPIのトークン
+        """
         super().__init__(apikey)
 
     def get_tasks_for_project(self, project_id, api_target):
-        """
+        """プロジェクトからタスク一覧を返す。
+
         project_id : プロジェクトID
         api_target : パラメータを含んだパス
         """
@@ -27,7 +38,10 @@ class GetTasks(AsanaBase):
         return data
 
     def get_overdue_tasks_for_project(self, project_id):
-        """
+        """プロジェクトから期日超過したタスクを返す。
+
+        起点日は実行時の日付としている。
+
         project_id : プロジェクトID
         """
         today_date = date.today()
@@ -57,7 +71,10 @@ class GetSections(AsanaBase):
         super().__init__(apikey)
 
     def get_sections_for_project(self, project_id):
-        """
+        """プロジェクトからセクション一覧を返す。
+
+        セクション一覧のIDが返り値となる。
+
         project_id : プロジェクトID
         """
         url = self.aurl + f"/projects/{project_id}/sections/?opt_fields=name,gid"
@@ -72,9 +89,9 @@ class GetCount(GetTasks):
         super().__init__(apikey)
 
     def get_count_completed_tasks_for_project(self, project_id):
-        """
+        """プロジェクトから完了タスク数を返す。
+
         project_id : プロジェクトID
-        ※ 完了タスク数を返す。
         """
         all_task = super().get_tasks_for_project(project_id, "opt_fields=completed")
         completed_tasks_count = 0
@@ -86,9 +103,9 @@ class GetCount(GetTasks):
         return completed_tasks_count
 
     def get_count_uncompleted_tasks_for_project(self, project_id):
-        """
+        """プロジェクトから未完了タスク数を返す。
+
         project_id : プロジェクトID
-        ※ 未完了タスク数を返す。
         """
         all_task = super().get_tasks_for_project(project_id, "opt_fields=completed")
         uncompleted_tasks_count = 0
