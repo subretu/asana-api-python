@@ -5,11 +5,12 @@ import json
 
 class AsanaBase:
     def __init__(self, apikey):
-        """API実行の準備を行う。
+        """"API実行の準備を行う。
 
         URL構築、APIキーの設定を行っている。
 
-        apikey : AsanaAPIのトークン
+        Args:
+            apikey (str): AsanaAPIのトークン
         """
         self.asana_url = "https://app.asana.com/api"
         self.api_version = "1.0"
@@ -21,15 +22,20 @@ class GetTasks(AsanaBase):
     def __init__(self, apikey):
         """親クラスの__init__を呼び出しを行う。
 
-        apikey : AsanaAPIのトークン
+        Args:
+            apikey (str): AsanaAPIのトークン
         """
         super().__init__(apikey)
 
     def get_tasks_for_project(self, project_id, api_target):
         """プロジェクトからタスク一覧を返す。
 
-        project_id : プロジェクトID
-        api_target : パラメータを含んだパス
+        Args:
+            project_id (int): プロジェクトID
+            api_target (str): パラメータを含んだパス
+
+        Returns:
+            json: タスク一覧
         """
         url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}"
         req = requests.get(url, auth=(self.apikey, ""))
@@ -42,7 +48,11 @@ class GetTasks(AsanaBase):
 
         起点日は実行時の日付としている。
 
-        project_id : プロジェクトID
+        Args:
+            project_id (int): プロジェクトID
+
+        Returns:
+            json: 期限超過しているタスク一覧
         """
         today_date = date.today()
         overdue＿tasks = []
@@ -68,14 +78,23 @@ class GetTasks(AsanaBase):
 
 class GetSections(AsanaBase):
     def __init__(self, apikey):
+        """親クラスの__init__を呼び出しを行う。
+
+        Args:
+            apikey (str): AsanaAPIのトークン
+        """
         super().__init__(apikey)
 
     def get_sections_for_project(self, project_id):
         """プロジェクトからセクション一覧を返す。
 
-        セクション一覧のIDが返り値となる。
+        起点日は実行時の日付としている。
 
-        project_id : プロジェクトID
+        Args:
+            project_id (int): プロジェクトID
+
+        Returns:
+            json: セクションID一覧
         """
         url = self.aurl + f"/projects/{project_id}/sections/?opt_fields=name,gid"
         req = requests.get(url, auth=(self.apikey, ""))
@@ -86,12 +105,21 @@ class GetSections(AsanaBase):
 
 class GetCount(GetTasks):
     def __init__(self, apikey):
+        """親クラスの__init__を呼び出しを行う。
+
+        Args:
+            apikey (str): AsanaAPIのトークン
+        """
         super().__init__(apikey)
 
     def get_count_completed_tasks_for_project(self, project_id):
         """プロジェクトから完了タスク数を返す。
 
-        project_id : プロジェクトID
+        Args:
+            project_id ([int]): プロジェクトID
+
+        Returns:
+            int: 完了タスク数
         """
         all_task = super().get_tasks_for_project(project_id, "opt_fields=completed")
         completed_tasks_count = 0
@@ -105,7 +133,11 @@ class GetCount(GetTasks):
     def get_count_uncompleted_tasks_for_project(self, project_id):
         """プロジェクトから未完了タスク数を返す。
 
-        project_id : プロジェクトID
+        Args:
+            project_id ([int]): プロジェクトID
+
+        Returns:
+            int: 未完了タスク数
         """
         all_task = super().get_tasks_for_project(project_id, "opt_fields=completed")
         uncompleted_tasks_count = 0
