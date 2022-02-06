@@ -4,7 +4,7 @@
 - AsanaAPIのPythonラッパー。
 - 公式のAPIリファレンスは下記を参照。
   - https://developers.asana.com/docs/asana
-## サンプル
+## サンプルケース
 - プロジェクトからタスク一覧を抽出
 
 ```python

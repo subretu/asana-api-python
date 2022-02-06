@@ -103,6 +103,46 @@ class GetSections(AsanaBase):
         return data
 
 
+class GetUsers(AsanaBase):
+    def __init__(self, apikey):
+        super().__init__(apikey)
+
+    def all_users_for_workspace(self, workspace_id):
+        """ワークスペースの全ユーザーを返す。
+
+        Args:
+            workspace_id (int): ワークスペースID
+
+        Returns:
+            json: 全ユーザー一覧
+        """
+        url = self.aurl + f"/users/?opt_fields=name,gid&workspace={workspace_id}"
+        req = requests.get(url, auth=(self.apikey, ""))
+        data = req.json()
+
+        return data
+
+    def target_user_for_workspace(self, workspace_id, target_username):
+        """ワークスペースの全ユーザーを返す。
+
+        Args:
+            workspace_id (int): ワークスペースID
+            target_username (str): 対象ユーザーの名前
+
+        Returns:
+            json: 対象ユーザー
+        """
+        url = self.aurl + f"/users/?opt_fields=name,gid&workspace={workspace_id}"
+        req = requests.get(url, auth=(self.apikey, ""))
+        data = req.json()
+
+        for i, item in enumerate(data["data"]):
+            if item["name"] == target_username:
+                return item
+        else:
+            return "Target username does not exist."
+
+
 class GetCount(GetTasks):
     def __init__(self, apikey):
         """親クラスの__init__を呼び出しを行う。
