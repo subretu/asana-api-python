@@ -45,7 +45,7 @@ from asana import asana
 asana_api = asana.GetCount("AsanaAPIKey")
 
 # 引数：プロジェクトID
-task_data = asana_apicompleted_tasks_for_project(1234567890123456)
+task_data = asana_api.completed_tasks_for_project(1234567890123456)
 ```
 
 
