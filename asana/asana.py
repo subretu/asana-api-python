@@ -27,7 +27,7 @@ class GetTasks(AsanaBase):
         """
         super().__init__(apikey)
 
-    def get_tasks_for_project(self, project_id, api_target):
+    def tasks_for_project(self, project_id, api_target):
         """プロジェクトからタスク一覧を返す。
 
         Args:
@@ -37,16 +37,31 @@ class GetTasks(AsanaBase):
         Returns:
             json: タスク一覧
         """
-        url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}"
+        api_data = []
+        all_data = []
+
+        url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}&limit=100"
         req = requests.get(url, auth=(self.apikey, ""))
         data = req.json()
 
-        return data
+        api_data = data["next_page"]["offset"]
 
-    def get_overdue_tasks_for_project(self, project_id):
+        while api_data:
+            url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}&limit=100&offset={api_data}"
+            req = requests.get(url, auth=(self.apikey, ""))
+            data = req.json()
+            all_data.extend(data["data"])
+            if data["next_page"] is not None:
+                api_data = data["next_page"]["offset"]
+            else:
+                return all_data
+
+        return all_data
+
+    def overdue_tasks_for_project(self, project_id):
         """プロジェクトから期日超過したタスクを返す。
 
-        起点日は実行時の日付としている。
+        デフォルトの起点日は実行時の日付としている。
 
         Args:
             project_id (int): プロジェクトID
@@ -55,13 +70,11 @@ class GetTasks(AsanaBase):
             json: 期限超過しているタスク一覧
         """
         today_date = date.today()
-        overdue＿tasks = []
+        overdue_tasks = []
 
-        url = (self.aurl + f"/projects/{project_id}/tasks/?opt_fields=due_on,name,completed")
-        req = requests.get(url, auth=(self.apikey, ""))
-        data = req.json()
+        all_task = self.tasks_for_project(project_id, "opt_fields=due_on,name,completed")
 
-        for i, item in enumerate(data["data"]):
+        for i, item in enumerate(all_task):
             if (
                 (not item["completed"])
                 and (item["due_on"] is not None)
@@ -71,9 +84,9 @@ class GetTasks(AsanaBase):
                     "name": item["name"],
                     "due_on": item["due_on"],
                 }
-                overdue＿tasks.append(data)
+                overdue_tasks.append(data)
 
-        return json.dumps(overdue＿tasks, ensure_ascii=False)
+        return json.dumps(overdue_tasks, ensure_ascii=False)
 
 
 class GetSections(AsanaBase):
@@ -85,7 +98,7 @@ class GetSections(AsanaBase):
         """
         super().__init__(apikey)
 
-    def get_sections_for_project(self, project_id):
+    def sections_for_project(self, project_id):
         """プロジェクトからセクション一覧を返す。
 
         起点日は実行時の日付としている。
@@ -100,7 +113,7 @@ class GetSections(AsanaBase):
         req = requests.get(url, auth=(self.apikey, ""))
         data = req.json()
 
-        return data
+        return data["data"]
 
 
 class GetUsers(AsanaBase):
@@ -120,7 +133,7 @@ class GetUsers(AsanaBase):
         req = requests.get(url, auth=(self.apikey, ""))
         data = req.json()
 
-        return data
+        return data["data"]
 
     def target_user_for_workspace(self, workspace_id, target_username):
         """ワークスペースの全ユーザーを返す。
@@ -152,7 +165,7 @@ class GetCount(GetTasks):
         """
         super().__init__(apikey)
 
-    def get_count_completed_tasks_for_project(self, project_id):
+    def completed_tasks_for_project(self, project_id):
         """プロジェクトから完了タスク数を返す。
 
         Args:
@@ -161,16 +174,16 @@ class GetCount(GetTasks):
         Returns:
             int: 完了タスク数
         """
-        all_task = super().get_tasks_for_project(project_id, "opt_fields=completed")
+        all_task = super().tasks_for_project(project_id, "opt_fields=completed")
         completed_tasks_count = 0
 
-        for i, item in enumerate(all_task["data"]):
+        for i, item in enumerate(all_task):
             if item["completed"]:
                 completed_tasks_count += 1
 
         return completed_tasks_count
 
-    def get_count_uncompleted_tasks_for_project(self, project_id):
+    def uncompleted_tasks_for_project(self, project_id):
         """プロジェクトから未完了タスク数を返す。
 
         Args:
@@ -179,10 +192,10 @@ class GetCount(GetTasks):
         Returns:
             int: 未完了タスク数
         """
-        all_task = super().get_tasks_for_project(project_id, "opt_fields=completed")
+        all_task = super().tasks_for_project(project_id, "opt_fields=completed")
         uncompleted_tasks_count = 0
 
-        for i, item in enumerate(all_task["data"]):
+        for i, item in enumerate(all_task):
             if not item["completed"]:
                 uncompleted_tasks_count += 1
 
