@@ -37,48 +37,53 @@ class GetTasks(AsanaBase):
         Returns:
             json: タスク一覧
         """
-        api_data = []
-        all_data = []
-
         url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}&limit=100"
         req = requests.get(url, auth=(self.apikey, ""))
         data = req.json()
+        all_data = data["data"]
 
-        api_data = data["next_page"]["offset"]
+        if data["next_page"] is not None:
+            api_data = data["next_page"]["offset"]
+            while api_data:
+                url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}&limit=100&offset={api_data}"
+                req = requests.get(url, auth=(self.apikey, ""))
+                data = req.json()
+                all_data.extend(data["data"])
+                if data["next_page"] is not None:
+                    api_data = data["next_page"]["offset"]
+                else:
+                    return all_data
+        else:
+            return data["data"]
 
-        while api_data:
-            url = self.aurl + f"/projects/{project_id}/tasks/?{api_target}&limit=100&offset={api_data}"
-            req = requests.get(url, auth=(self.apikey, ""))
-            data = req.json()
-            all_data.extend(data["data"])
-            if data["next_page"] is not None:
-                api_data = data["next_page"]["offset"]
-            else:
-                return all_data
-
-        return all_data
-
-    def overdue_tasks_for_project(self, project_id):
+    def overdue_tasks_for_project(self, project_id, *args):
         """プロジェクトから期日超過したタスクを返す。
 
-        デフォルトの起点日は実行時の日付としている。
+        起点日を指定しない場合の起点日は実行時の日付となる。
 
         Args:
             project_id (int): プロジェクトID
+            *args (str): 起点日（yyyy-mm-dd）
 
         Returns:
             json: 期限超過しているタスク一覧
         """
-        today_date = date.today()
+        target_date = ""
+
+        if args:
+            target_date = datetime.strptime(args[0], "%Y-%m-%d").date()
+        else:
+            target_date = date.today()
+
         overdue_tasks = []
 
         all_task = self.tasks_for_project(project_id, "opt_fields=due_on,name,completed")
 
         for i, item in enumerate(all_task):
             if (
-                (not item["completed"])
+                (item["completed"] is False)
                 and (item["due_on"] is not None)
-                and (datetime.strptime(item["due_on"], "%Y-%m-%d").date() < today_date)
+                and (datetime.strptime(item["due_on"], "%Y-%m-%d").date() < target_date)
             ):
                 data = {
                     "name": item["name"],
