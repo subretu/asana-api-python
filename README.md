@@ -4,6 +4,17 @@
 - AsanaAPIのPythonラッパー。
 - 公式のAPIリファレンスは下記を参照。
   - https://developers.asana.com/docs/asana
+
+## パッケージインストール
+- pipを使ったパッケージのインストールが可能。
+- 手順は下記の通り。
+1. リポジトリのgit cloneを行う。
+2. 下記コマンドを実行する
+  ```zsh
+  # 実行例はパッケージの場所を相対パスで記載しているが絶対パスでも可
+  pip install ./asana-api-python/
+  ```
+
 ## サンプルケース
 - プロジェクトからタスク一覧を抽出
 
