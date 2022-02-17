@@ -1,6 +1,6 @@
 # asana-api-python
 
-- AsanaAPIのPythonラッパー。
+- Asana APIのPythonラッパー。
 - 公式のAPIリファレンスは下記を参照。
   - https://developers.asana.com/docs/asana
 
