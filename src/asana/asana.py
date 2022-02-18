@@ -1,6 +1,5 @@
 import requests
 from datetime import datetime, date
-import json
 
 
 class AsanaBase:
@@ -59,11 +58,10 @@ class GetTasks(AsanaBase):
     def overdue_tasks_for_project(self, project_id, *args):
         """プロジェクトから期日超過したタスクを返す。
 
-        起点日を指定しない場合の起点日は実行時の日付となる。
+        デフォルトの起点日は実行時の日付としている。
 
         Args:
             project_id (int): プロジェクトID
-            *args (str): 起点日（yyyy-mm-dd）
 
         Returns:
             json: 期限超過しているタスク一覧
@@ -91,7 +89,8 @@ class GetTasks(AsanaBase):
                 }
                 overdue_tasks.append(data)
 
-        return json.dumps(overdue_tasks, ensure_ascii=False)
+        #return json.dumps(overdue_tasks, ensure_ascii=False)
+        return overdue_tasks
 
 
 class GetSections(AsanaBase):
@@ -126,7 +125,7 @@ class GetUsers(AsanaBase):
         super().__init__(apikey)
 
     def all_users_for_workspace(self, workspace_id):
-        """ワークスペースの全ユーザーを返す。
+        """ワークスペースの全ユーザー情報を返す。
 
         Args:
             workspace_id (int): ワークスペースID
@@ -141,7 +140,7 @@ class GetUsers(AsanaBase):
         return data["data"]
 
     def target_user_for_workspace(self, workspace_id, target_username):
-        """ワークスペースの全ユーザーを返す。
+        """ワークスペースの対象ユーザーの情報を返す。
 
         Args:
             workspace_id (int): ワークスペースID
@@ -153,10 +152,12 @@ class GetUsers(AsanaBase):
         url = self.aurl + f"/users/?opt_fields=name,gid&workspace={workspace_id}"
         req = requests.get(url, auth=(self.apikey, ""))
         data = req.json()
+        json_data = []
 
         for i, item in enumerate(data["data"]):
             if item["name"] == target_username:
-                return item
+                json_data.append(item)
+                return json_data
         else:
             return "Target username does not exist."
 

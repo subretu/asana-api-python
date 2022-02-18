@@ -11,7 +11,10 @@ setup(
     description="Asana api wrapper by python.",
     author="subretu",
     url="https://github.com/subretu/asana-api-python",
-    packages=find_packages(),
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     zip_safe=False,
     install_requires=_requires_from_file("requirements.txt"),
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest", "pytest-cov"]
 )
