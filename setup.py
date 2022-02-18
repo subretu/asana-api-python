@@ -7,7 +7,7 @@ def _requires_from_file(filename):
 
 setup(
     name="asana",
-    version="1.0",
+    version="1.0.0",
     description="Asana api wrapper by python.",
     author="subretu",
     url="https://github.com/subretu/asana-api-python",
