@@ -1,4 +1,5 @@
 from src.asana import asana
+import pytest
 
 
 class TestGetTasks:
@@ -21,3 +22,10 @@ class TestGetTasks:
         test_data = [{"name": "タスクZZZZZ", "due_on": "2022-02-01"}]
 
         assert result_data == test_data
+
+    def test_tasks_for_project_error(self, asanabase):
+        with pytest.raises(Exception) as e:
+            asana_api = asana.GetCount(asanabase[0])
+            _ = asana_api.tasks_for_project(12345, "opt_fields=name,gid")
+
+        assert str(e.value) == "invalid project_id"
