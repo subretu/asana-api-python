@@ -29,3 +29,17 @@ class TestGetTasks:
             _ = asana_api.tasks_for_project(12345, "opt_fields=name,gid")
 
         assert str(e.value) == "invalid project_id"
+
+    def test_tasks_for_project_fail(self, asanabase):
+        with pytest.raises(Exception) as e:
+            asana_api = asana.GetTasks(asanabase[0])
+            _ = asana_api.tasks_for_project(1234, "opt_fields=name,gid")
+
+        assert str(e.value) == "invalid project_id"
+
+    def test_overdue_tasks_for_project_fail(self, asanabase):
+        with pytest.raises(Exception) as e:
+            asana_api = asana.GetTasks(asanabase[0])
+            _ = asana_api.overdue_tasks_for_project(12345)
+
+        assert str(e.value) == "invalid project_id"

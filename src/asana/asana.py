@@ -94,31 +94,37 @@ class GetTasks(AsanaBase):
             list: 期限超過しているタスク一覧
         """
         try:
-            target_date = ""
-            overdue_tasks = []
+            if _check_project_id(project_id):
+                target_date = ""
+                overdue_tasks = []
 
-            if args:
-                target_date = datetime.strptime(args[0], "%Y-%m-%d").date()
+                if args:
+                    target_date = datetime.strptime(args[0], "%Y-%m-%d").date()
+                else:
+                    target_date = date.today()
+
+                all_task = self.tasks_for_project(
+                    project_id, "opt_fields=due_on,name,completed"
+                )
+
+                for i, item in enumerate(all_task):
+                    if (
+                        (item["completed"] is False)
+                        and (item["due_on"] is not None)
+                        and (
+                            datetime.strptime(item["due_on"], "%Y-%m-%d").date()
+                            < target_date
+                        )
+                    ):
+                        data = {
+                            "name": item["name"],
+                            "due_on": item["due_on"],
+                        }
+                        overdue_tasks.append(data)
+
+                return overdue_tasks
             else:
-                target_date = date.today()
-
-            all_task = self.tasks_for_project(
-                project_id, "opt_fields=due_on,name,completed"
-            )
-
-            for i, item in enumerate(all_task):
-                if (
-                    (item["completed"] is False)
-                    and (item["due_on"] is not None)
-                    and (datetime.strptime(item["due_on"], "%Y-%m-%d").date() < target_date)
-                ):
-                    data = {
-                        "name": item["name"],
-                        "due_on": item["due_on"],
-                    }
-                    overdue_tasks.append(data)
-
-            return overdue_tasks
+                raise Exception("invalid project_id")
         except Exception as e:
             raise
 
@@ -145,7 +151,9 @@ class GetSections(AsanaBase):
         """
         try:
             if _check_project_id(project_id):
-                url = self.aurl + f"/projects/{project_id}/sections/?opt_fields=name,gid"
+                url = (
+                    self.aurl + f"/projects/{project_id}/sections/?opt_fields=name,gid"
+                )
                 req = requests.get(url, auth=(self.apikey, ""))
                 req.raise_for_status()
                 data = req.json()
