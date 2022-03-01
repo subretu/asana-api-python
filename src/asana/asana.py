@@ -120,7 +120,7 @@ class GetTasks(AsanaBase):
 
             return overdue_tasks
         except Exception as e:
-            print(e)
+            raise
 
 
 class GetSections(AsanaBase):
@@ -152,7 +152,7 @@ class GetSections(AsanaBase):
 
                 return data["data"]
         except Exception as e:
-            print(e)
+            raise
 
 
 class GetUsers(AsanaBase):
@@ -176,7 +176,7 @@ class GetUsers(AsanaBase):
 
             return data["data"]
         except Exception as e:
-            print(e)
+            raise
 
     def target_user_for_workspace(self, workspace_id, target_username):
         """ワークスペースの対象ユーザーの情報を返す。
@@ -202,7 +202,7 @@ class GetUsers(AsanaBase):
             else:
                 return "Target username does not exist"
         except Exception as e:
-            print(e)
+            raise
 
 
 class GetCount(GetTasks):
@@ -233,7 +233,7 @@ class GetCount(GetTasks):
 
             return completed_tasks_count
         except Exception as e:
-            print(e)
+            raise
 
     def uncompleted_tasks_for_project(self, project_id):
         """プロジェクトから未完了タスク数を返す。
@@ -254,4 +254,4 @@ class GetCount(GetTasks):
 
             return uncompleted_tasks_count
         except Exception as e:
-            print(e)
+            raise
