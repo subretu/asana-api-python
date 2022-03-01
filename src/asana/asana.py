@@ -159,6 +159,8 @@ class GetSections(AsanaBase):
                 data = req.json()
 
                 return data["data"]
+            else:
+                raise Exception("invalid project_id")
         except Exception as e:
             raise
 
